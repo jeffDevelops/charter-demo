@@ -7,15 +7,26 @@ import React, {
 import Table from '../../_components/Table/Table'
 import { Restaurant } from '../../_types/entities/Restaurant'
 import { restaurantSchema } from './restaurantSchema'
-import { Container } from './styled'
-import Select from 'react-select'
+import { Container, P } from './styled'
+import Input from '../../_components/Input/Input'
+import { useFilters } from '../../_components/Table/hooks/useFilters'
+import { GENRES } from './config/FilterableGenres'
+import { STATES } from './config/FilterableStates'
 
 const Restaurants = () => {
   const [loading, setLoading] = useState(false)
   const [restaurants, setRestaurants] = useState<
     Restaurant[] | null
   >(null)
+
+  // Search input value; could be different than...
   const [search, setSearch] = useState('')
+  // ...the current search, until the user clicks the search button / hits Enter key again
+  const [currentSearch, setCurrentSearch] = useState('')
+  // The fully processed results
+  const [results, setResults] = useState<Restaurant[] | null>(
+    null,
+  )
 
   const fetchRestaurants = useCallback(async () => {
     setLoading(true)
@@ -44,10 +55,6 @@ const Restaurants = () => {
     )
   }, [restaurants])
 
-  const mockAPI = useCallback(() => {}, [])
-
-  console.log({ sorted })
-
   // On mount, fetch the restaurants for the first time
   useEffect(() => {
     // Used to prevent SetStateActions if component unmounted
@@ -70,30 +77,94 @@ const Restaurants = () => {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [fetchRestaurants])
+
+  /** Manage filter state */
+  const { filterState, dispatchFilterAction } = useFilters([
+    {
+      name: 'genres',
+      values: GENRES,
+    },
+    {
+      name: 'state',
+      values: STATES,
+    },
+  ])
+
+  const processResults = useCallback(() => {
+    if (!sorted) return []
+
+    // Create a case-insensitive search pattern, allowing for partial-word matches
+    const searchPattern =
+      currentSearch.trim() === ''
+        ? null
+        : new RegExp(currentSearch.trim(), 'gi')
+
+    console.log({ searchPattern })
+
+    const filtered = sorted.filter(row => {
+      let satisfiesSearch = true
+      let satisfiesFilters = true
+
+      // Search
+      if (!!searchPattern) {
+        console.log({ searchPattern })
+
+        satisfiesSearch =
+          !!row.name.toLowerCase().match(searchPattern) ||
+          !!row.city.toLowerCase().match(searchPattern) ||
+          !!row.genre.toLowerCase().match(searchPattern)
+      }
+
+      // Filter
+      if (!filterState.all) {
+      }
+      // TODO:
+
+      // console.log({ satisfiesFilters, satisfiesSearch })
+
+      return satisfiesSearch && satisfiesFilters
+    })
+
+    return filtered
+  }, [currentSearch, sorted, filterState])
+
+  useEffect(() => {
+    setResults(processResults())
+  }, [filterState, currentSearch, sorted, processResults])
+
+  console.log({ filterState, results })
 
   if (loading) return <>Loading...</>
-  if (!sorted) return null
+  if (!results) return null
 
   return (
     <Container>
       <Input
+        clearInput={() => {
+          setSearch('')
+          setCurrentSearch('')
+        }}
+        triggerSearch={() => {
+          setCurrentSearch(search)
+        }}
+        placeholder="Search by name, city, or genre"
         id="search_input"
         name="search"
         value={search}
+        autoComplete="off"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setSearch(e.target.value)
         }
       />
+      <P>Current search: "{currentSearch}"</P>
       <Table<Restaurant>
         schema={restaurantSchema}
-        filterableColumns={['state', 'genre']}
-        searchableColumns={['name', 'city', 'genre']}
         paginationOptions={{
           initialPage: 0,
           initialResultsPerPage: 10,
         }}
-        rows={sorted}
+        rows={results}
       />
     </Container>
   )

@@ -18,8 +18,6 @@ import { usePagination } from './hooks/usePagination'
 
 interface TableProps<T extends {}> {
   paginationOptions: PaginationOptions
-  filterableColumns: Array<keyof T>
-  searchableColumns: Array<keyof T>
   schema: Column<T>[]
   rows: Row<T>[]
 }

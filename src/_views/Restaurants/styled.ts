@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export const Container = styled.main`
   min-height: 100vh;
@@ -11,16 +11,8 @@ export const Container = styled.main`
   margin: auto;
 `
 
-export const Input = styled.input`
-  height: 36px;
-  width: 100%;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  outline: none;
-  box-shadow: 0 3px 7px #dce3fd;
-
-  &::placeholder {
-    color: #b3c0e1;
-  }
+export const P = styled.p`
+  font-size: 14px;
+  letter-spacing: 0.75px;
+  color: #637081;
 `
