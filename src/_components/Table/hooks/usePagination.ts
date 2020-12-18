@@ -1,4 +1,4 @@
-import { useReducer, Reducer, useEffect } from 'react'
+import { useReducer, Reducer, useEffect, useMemo } from 'react'
 import { Row, PaginationOptions } from '../Table.d'
 
 interface PageState {
@@ -8,15 +8,17 @@ interface PageState {
   resultsCount: number
 }
 
-type PageAction =
+type PageAction<T extends {}> =
   | {
-      /* Consolidate all of the logic for managing the page in one action */
-      type: 'UPDATE_PAGE'
-      value: number
+      type: 'INCREMENT'
+    }
+  | {
+      type: 'DECREMENT'
     }
   | {
       /* Expose an action to reset the pagination upon changes to searches / filters */
       type: 'RESET_PAGE'
+      rows: Row<T>[]
     }
   | {
       /* TODO: (Stretch goal) Allow the user to change the page size */
@@ -64,58 +66,62 @@ const initialState = <T extends {}>(
   resultsCount: rows.length,
 })
 
-const paginationReducer: Reducer<PageState, PageAction> = <
-  T extends {}
->(
-  prevState: PageState,
-  action: PageAction,
-) => {
-  switch (action.type) {
-    case 'UPDATE_PAGE':
-      return {
-        ...prevState,
-        resultsStartIndex:
-          prevState.resultsPerPage * action.value,
-        resultsEndIndex:
-          prevState.resultsPerPage * action.value +
-          prevState.resultsPerPage,
-        resultsCount: prevState.resultsCount,
-      }
-    case 'UPDATE_PAGE_SIZE':
-      return {
-        ...prevState,
-        resultsEndIndex: Math.min(
-          prevState.resultsStartIndex + action.value,
-          prevState.resultsCount,
-        ),
-      }
-    case 'RESET_PAGE':
-      return {
-        ...prevState,
-        resultsStartIndex: 0,
-        resultsEndIndex: Math.min(
-          0 + prevState.resultsPerPage,
-          prevState.resultsCount,
-        ),
-      }
-    default:
-      return prevState
-  }
-}
-
 export const usePagination = <T extends {}>(
   options: PaginationOptions,
   rows: Row<T>[],
 ) => {
+  const paginationReducer: Reducer<PageState, PageAction<T>> = <
+    T extends {}
+  >(
+    prevState: PageState,
+    action: PageAction<T>,
+  ) => {
+    switch (action.type) {
+      case 'INCREMENT':
+        return {
+          ...prevState,
+          resultsStartIndex:
+            prevState.resultsStartIndex +
+            prevState.resultsPerPage,
+          resultsEndIndex: Math.min(
+            prevState.resultsEndIndex + prevState.resultsPerPage,
+            prevState.resultsCount,
+          ),
+        }
+      case 'DECREMENT':
+        const resultsStartIndex =
+          prevState.resultsStartIndex - prevState.resultsPerPage
+        return {
+          ...prevState,
+          resultsStartIndex,
+          resultsEndIndex:
+            resultsStartIndex + prevState.resultsPerPage,
+        }
+      case 'RESET_PAGE':
+        return {
+          ...prevState,
+          resultsStartIndex: 0,
+          resultsEndIndex: Math.min(
+            prevState.resultsPerPage,
+            action.rows.length,
+          ),
+          resultsCount: action.rows.length,
+        }
+      default:
+        return prevState
+    }
+  }
   const [pageState, dispatchPageAction] = useReducer(
     paginationReducer,
     initialState(options, rows),
   )
 
-  // If the resultsCount changes, reset the pagination
   useEffect(() => {
-    dispatchPageAction({ type: 'RESET_PAGE' })
-  }, [rows.length])
+    dispatchPageAction({
+      type: 'RESET_PAGE',
+      rows,
+    })
+  }, [rows])
 
   return {
     ...pageState,

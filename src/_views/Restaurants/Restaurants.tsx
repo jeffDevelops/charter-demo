@@ -82,15 +82,19 @@ const Restaurants = () => {
   /** Manage filter state */
   const { filterState, dispatchFilterAction } = useFilters([
     {
-      name: 'genres',
-      values: GENRES,
+      name: 'genre',
+      columns: GENRES,
     },
     {
       name: 'state',
-      values: STATES,
+      columns: STATES,
     },
   ])
 
+  /** Processing logic for filtering / searching belongs on the server, but
+   * for this exercise, it's abstracted away from the actual table component
+   * so that it can be used for different resources
+   */
   const processResults = useCallback(() => {
     if (!sorted) return []
 
@@ -100,16 +104,12 @@ const Restaurants = () => {
         ? null
         : new RegExp(currentSearch.trim(), 'gi')
 
-    console.log({ searchPattern })
-
     const filtered = sorted.filter(row => {
       let satisfiesSearch = true
       let satisfiesFilters = true
 
       // Search
       if (!!searchPattern) {
-        console.log({ searchPattern })
-
         satisfiesSearch =
           !!row.name.toLowerCase().match(searchPattern) ||
           !!row.city.toLowerCase().match(searchPattern) ||
@@ -117,11 +117,27 @@ const Restaurants = () => {
       }
 
       // Filter
-      if (!filterState.all) {
-      }
-      // TODO:
+      // State: per row, use the filter map to check whether that row's state's filter has been "engaged"
+      const satisfiesStateFilter =
+        filterState.state.values[row.state]
 
-      // console.log({ satisfiesFilters, satisfiesSearch })
+      // Genre: because of the string structure of this data, we can search each row's string for all of the "engaged" filters in the filterState
+      const engagedGenres = Object.keys(
+        filterState.genre.values,
+      ).filter(key => filterState.genre.values[key])
+
+      const allEngagedGenresIncluded = engagedGenres.every(
+        filter => {
+          const pattern = new RegExp(filter, 'gi')
+          return !!row.genre.match(pattern)
+        },
+      )
+
+      const satisfiesGenreFilter =
+        filterState.genre.all || allEngagedGenresIncluded
+
+      satisfiesFilters =
+        satisfiesStateFilter && satisfiesGenreFilter
 
       return satisfiesSearch && satisfiesFilters
     })
@@ -132,8 +148,6 @@ const Restaurants = () => {
   useEffect(() => {
     setResults(processResults())
   }, [filterState, currentSearch, sorted, processResults])
-
-  console.log({ filterState, results })
 
   if (loading) return <>Loading...</>
   if (!results) return null
@@ -157,8 +171,14 @@ const Restaurants = () => {
           setSearch(e.target.value)
         }
       />
-      <P>Current search: "{currentSearch}"</P>
+      <P>
+        {currentSearch && `Current search: "${currentSearch}"`}
+      </P>
       <Table<Restaurant>
+        filterOptions={{
+          filterState,
+          dispatchFilterAction,
+        }}
         schema={restaurantSchema}
         paginationOptions={{
           initialPage: 0,

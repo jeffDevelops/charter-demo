@@ -4,9 +4,34 @@ import { KeyboardArrowRight } from '@styled-icons/material/KeyboardArrowRight'
 export const Card = styled.section`
   width: 100%;
   max-height: 700px;
+  max-width: 1000px;
   box-shadow: 0 3px 7px #dce3fd;
   border-radius: 8px;
-  overflow: auto;
+  overflow: hidden;
+`
+
+export const Scrollable = styled.div`
+  overflow: overlay;
+  height: 700px;
+  padding-bottom: 80px;
+
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+  ::-webkit-scrollbar-track:horizontal {
+    background: #fffffa;
+  }
+  ::-webkit-scrollbar:horizontal {
+    height: 8px;
+  }
+  ::-webkit-scrollbar:vertical {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid white;
+    border-radius: 4px;
+    background-color: #dce3fd;
+  }
 `
 
 export const THead = styled.thead`
@@ -27,7 +52,7 @@ export const TH = styled.th`
 export const ColumnControls = styled.th`
   border-style: none;
   position: sticky;
-  top: 66px;
+  top: 49px;
   padding: 16px;
   letter-spacing: 0.75px;
   font-weight: 500;
@@ -61,15 +86,16 @@ export const TR = styled.tr`
 `
 
 export const Pagination = styled.div`
-  height: 100px;
+  height: 80px;
   background-color: #fffffa;
   position: sticky;
-  bottom: 0;
+  bottom: 6px;
   width: 100%;
   border-top: 2px solid #ecf3fd;
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 0;
 `
 
 export const Table = styled.table`
@@ -79,6 +105,7 @@ export const Table = styled.table`
   color: #637081;
   max-width: 100%;
   min-width: 100%;
+  overflow: auto;
 `
 
 export const PaginationButton = styled.button<{

@@ -41,7 +41,6 @@ export const Input = styled.input`
   padding: 8px 16px;
   outline: none;
   box-shadow: 0 3px 7px #dce3fd;
-  margin-bottom: 16px;
   background-color: #fffffa;
   position: relative;
   z-index: 1;

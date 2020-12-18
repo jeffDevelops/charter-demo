@@ -15,4 +15,6 @@ export const P = styled.p`
   font-size: 14px;
   letter-spacing: 0.75px;
   color: #637081;
+  width: 100%;
+  margin-bottom: 32px;
 `
