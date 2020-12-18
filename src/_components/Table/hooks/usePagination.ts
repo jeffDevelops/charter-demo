@@ -1,4 +1,4 @@
-import { useReducer, Reducer, useEffect, useMemo } from 'react'
+import { useReducer, Reducer, useEffect } from 'react'
 import { Row, PaginationOptions } from '../Table.d'
 
 interface PageState {

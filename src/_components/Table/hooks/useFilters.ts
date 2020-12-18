@@ -1,4 +1,4 @@
-import React, { useReducer, Reducer } from 'react'
+import { useReducer, Reducer } from 'react'
 import {
   FilterActions,
   ColumnFilterState,
