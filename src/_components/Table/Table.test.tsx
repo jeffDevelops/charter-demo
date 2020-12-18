@@ -63,6 +63,24 @@ describe('<Table />', () => {
     })
   })
 
+  it('renders an empty state if no data is present to match the filters', () => {
+    const { getByText, getByTestId } = renderTable(
+      consistentProps,
+      {
+        rows: [],
+        progress: 100,
+      },
+    )
+
+    expect(
+      getByText(
+        /No results matched your search and filter parameters. Please adjust your search parameters and try again./i,
+      ),
+    ).toBeInTheDocument()
+
+    expect(getByTestId('empty_state')).toBeInTheDocument()
+  })
+
   it('renders the table data according to provided data', () => {
     const { getByTestId } = renderTable()
 

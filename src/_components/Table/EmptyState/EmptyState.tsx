@@ -8,7 +8,7 @@ import {
 
 const EmptyState = () => {
   return (
-    <Position>
+    <Position data-testid="empty_state">
       <Row>
         <EmptyStateIcon />
         <EmptyStateText>

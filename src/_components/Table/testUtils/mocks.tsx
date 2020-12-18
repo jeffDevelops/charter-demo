@@ -107,7 +107,7 @@ export const mockData: TestSchema[] = [
   },
   {
     id: '6',
-    name: 'Denver Biscuit Company',
+    name: 'The French Press',
     city: 'Denver',
     state: 'CO',
     telephone: '0987654321',

@@ -37,6 +37,7 @@ const Select = <T extends {}>({
   return (
     <ReactSelect
       isMulti
+      id={`select_${field}`}
       theme={theme}
       placeholder="All"
       defaultValue={[]}

@@ -1,6 +1,6 @@
 import { Column } from '../../_components/Table/Table.d'
 import { Restaurant } from '../../_types/entities/Restaurant'
-import TableTags from '../../_components/Table/TableTags'
+import TableTags from '../../_components/Table/TableTags/TableTags'
 
 export const restaurantSchema: Column<Restaurant>[] = [
   {

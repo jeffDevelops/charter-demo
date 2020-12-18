@@ -30,7 +30,10 @@ const Input: FC<InputProps> = ({
       <SearchInputControls>
         <ClearButton onClick={clearInput} />
         <Pipe>|</Pipe>
-        <SearchButton onClick={triggerSearch} />
+        <SearchButton
+          data-testid="search_button"
+          onClick={triggerSearch}
+        />
       </SearchInputControls>
     </Form>
   )
