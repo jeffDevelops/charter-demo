@@ -4,7 +4,7 @@ A generic table component, used in this demo to consume a Restaurants endpoint.
 
 ## Demo Link
 
-https://charter-demo-jsbu4tjwu.vercel.app/j
+https://charter-demo.vercel.app/
 
 ## Tests
 
