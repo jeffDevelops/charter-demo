@@ -1,9 +1,10 @@
 export interface TestSchema {
+  id: string
   name: string
   city: string
   state: string
-  phoneNumber: string
-  genres: string[]
+  telephone: string
+  genre: string
   attire: string
   mustTry?: string
 }

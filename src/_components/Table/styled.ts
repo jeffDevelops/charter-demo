@@ -48,7 +48,7 @@ export const TH = styled.th`
   font-weight: 500;
   font-size: 14px;
   background-color: #fffffa;
-  box-shadow: 0 1px 0px #ecf3fd; /* border is collapsed from overall border-collapse, so simulate one with a box-shadow */
+  box-shadow: 0 2px 0px #ecf3fd; /* border is collapsed from overall border-collapse, so simulate one with a box-shadow */
 `
 
 export const ColumnControls = styled.th`
@@ -60,7 +60,7 @@ export const ColumnControls = styled.th`
   font-weight: 500;
   font-size: 14px;
   background-color: #fffffa;
-  box-shadow: 0 1px 0px #ecf3fd; /* border is collapsed from overall border-collapse, so simulate one with a box-shadow */
+  box-shadow: 0 2px 0px #ecf3fd; /* border is collapsed from overall border-collapse, so simulate one with a box-shadow */
   z-index: 1;
 `
 

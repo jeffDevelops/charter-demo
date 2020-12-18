@@ -30,8 +30,9 @@ import { usePagination } from './hooks/usePagination'
 import Select from './Select/Select'
 import EmptyState from './EmptyState/EmptyState'
 import LoadingState from './LoadingState/LoadingState'
+import { useScrollToEffect } from './hooks/useScrollToEffect'
 
-interface TableProps<T extends {}> {
+export interface TableProps<T extends {}> {
   paginationOptions: PaginationOptions
   filterOptions: {
     filterState: FilterState
@@ -60,13 +61,10 @@ const Table = <T extends {}>({
   const tableRef = useRef<HTMLTableElement>(null)
 
   // If the pagination page changes, scroll to the top of the page
-  useEffect(() => {
-    if (tableRef.current)
-      tableRef.current.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      })
-  }, [resultsStartIndex, resultsEndIndex])
+  useScrollToEffect(tableRef, [
+    resultsStartIndex,
+    resultsEndIndex,
+  ])
 
   const page = useMemo(() => {
     return rows.slice(resultsStartIndex, resultsEndIndex) // slice end of range is non-inclusive
@@ -77,7 +75,7 @@ const Table = <T extends {}>({
       <Scrollable>
         <StyledTable>
           <THead>
-            <TR>
+            <TR data-testid="table_headings">
               {schema.map(({ key, heading, cellStyles }) => (
                 <TH style={cellStyles} key={key}>
                   {heading}
@@ -136,7 +134,7 @@ const Table = <T extends {}>({
             </TR>
             <TR />
           </THead>
-          <tbody>
+          <tbody data-testid="table_body">
             {page.map(row => {
               return (
                 <TR
