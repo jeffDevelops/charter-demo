@@ -1,4 +1,4 @@
-import React, { FC, Dispatch } from 'react'
+import React, { Dispatch } from 'react'
 import ReactSelect, { ValueType, Theme } from 'react-select'
 import { FilterActions, FilterState } from '../Table.d'
 

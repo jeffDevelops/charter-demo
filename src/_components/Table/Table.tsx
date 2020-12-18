@@ -72,11 +72,6 @@ const Table = <T extends {}>({
     return rows.slice(resultsStartIndex, resultsEndIndex) // slice end of range is non-inclusive
   }, [resultsStartIndex, resultsEndIndex, rows])
 
-  useEffect(() => console.log({ progress, resultsCount }), [
-    progress,
-    resultsCount,
-  ])
-
   return (
     <Card ref={tableRef}>
       <Scrollable>
