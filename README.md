@@ -8,7 +8,7 @@ https://charter-demo-jsbu4tjwu.vercel.app/j
 
 ## Tests
 
-To run the tests, run `npm run test` with in the project directory
+To run the tests, run `npm run test` within the project directory
 
 ## Note:
 
