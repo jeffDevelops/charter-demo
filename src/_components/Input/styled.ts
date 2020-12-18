@@ -6,7 +6,7 @@ export const borderAnimationStyles = () => css`
   &:after {
     content: ' ';
     position: absolute;
-    bottom: 12px;
+    bottom: -4px;
     left: 0;
     width: 0;
     background-color: #229bf2;
@@ -44,6 +44,7 @@ export const Input = styled.input`
   background-color: #fffffa;
   position: relative;
   z-index: 1;
+  border: 1px solid #ecf3fd;
 
   &::placeholder {
     color: #b3c0e1;
@@ -58,14 +59,15 @@ export const Input = styled.input`
 export const SearchInputControls = styled.div`
   position: absolute;
   z-index: 2;
-  top: 8px;
+  top: 7px;
   right: 16px;
 `
 
 const buttonStyles = css`
   cursor: pointer;
   fill: #b3c0e1;
-  height: 24px;
+  height: 18px;
+  margin-top: -2px;
 `
 
 export const SearchButton = styled(Search).attrs({
@@ -86,4 +88,5 @@ export const Pipe = styled.div`
   color: #b3c0e1;
   font-size: 24px;
   user-select: none;
+  font-weight: 100;
 `

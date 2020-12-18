@@ -7,14 +7,14 @@ import React, {
 import Table from '../../_components/Table/Table'
 import { Restaurant } from '../../_types/entities/Restaurant'
 import { restaurantSchema } from './restaurantSchema'
-import { Container, P } from './styled'
+import { Container, Row, P, ClearButton } from './styled'
 import Input from '../../_components/Input/Input'
 import { useFilters } from '../../_components/Table/hooks/useFilters'
 import { GENRES } from './config/FilterableGenres'
 import { STATES } from './config/FilterableStates'
 
 const Restaurants = () => {
-  const [loading, setLoading] = useState(false)
+  const [progress, setProgress] = useState(0)
   const [restaurants, setRestaurants] = useState<
     Restaurant[] | null
   >(null)
@@ -29,7 +29,7 @@ const Restaurants = () => {
   )
 
   const fetchRestaurants = useCallback(async () => {
-    setLoading(true)
+    setProgress(80)
     return fetch(
       'https://code-challenge.spectrumtoolbox.com/api/restaurants',
       {
@@ -70,7 +70,6 @@ const Restaurants = () => {
           }
         })
         .catch(error => console.error(error))
-        .finally(() => mounted && setLoading(false))
     }
 
     // Toggle mounted in cleanup function
@@ -93,10 +92,10 @@ const Restaurants = () => {
 
   /** Processing logic for filtering / searching belongs on the server, but
    * for this exercise, it's abstracted away from the actual table component
-   * so that it can be used for different resources
+   * so that the table component can be used for different resources
    */
   const processResults = useCallback(() => {
-    if (!sorted) return []
+    if (!sorted || sorted.length === 0) return []
 
     // Create a case-insensitive search pattern, allowing for partial-word matches
     const searchPattern =
@@ -117,6 +116,7 @@ const Restaurants = () => {
       }
 
       // Filter
+
       // State: per row, use the filter map to check whether that row's state's filter has been "engaged"
       const satisfiesStateFilter =
         filterState.state.values[row.state]
@@ -149,15 +149,15 @@ const Restaurants = () => {
     setResults(processResults())
   }, [filterState, currentSearch, sorted, processResults])
 
-  if (loading) return <>Loading...</>
-  if (!results) return null
+  useEffect(() => {
+    if (results && results.length > 0) setProgress(100)
+  }, [results])
 
   return (
     <Container>
       <Input
         clearInput={() => {
           setSearch('')
-          setCurrentSearch('')
         }}
         triggerSearch={() => {
           setCurrentSearch(search)
@@ -171,10 +171,24 @@ const Restaurants = () => {
           setSearch(e.target.value)
         }
       />
-      <P>
-        {currentSearch && `Current search: "${currentSearch}"`}
-      </P>
+
+      <Row>
+        <P>
+          {currentSearch && `Current search: "${currentSearch}"`}
+        </P>
+        {currentSearch && (
+          <ClearButton
+            onClick={() => {
+              setCurrentSearch('')
+            }}
+          >
+            Clear
+          </ClearButton>
+        )}
+      </Row>
+
       <Table<Restaurant>
+        progress={progress}
         filterOptions={{
           filterState,
           dispatchFilterAction,
@@ -184,7 +198,7 @@ const Restaurants = () => {
           initialPage: 0,
           initialResultsPerPage: 10,
         }}
-        rows={results}
+        rows={results || []}
       />
     </Container>
   )

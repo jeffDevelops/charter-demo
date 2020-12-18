@@ -27,7 +27,9 @@ import {
   RightChevron,
 } from './styled'
 import { usePagination } from './hooks/usePagination'
-import Select from 'react-select'
+import Select from './Select/Select'
+import EmptyState from './EmptyState/EmptyState'
+import LoadingState from './LoadingState/LoadingState'
 
 interface TableProps<T extends {}> {
   paginationOptions: PaginationOptions
@@ -37,6 +39,7 @@ interface TableProps<T extends {}> {
   }
   schema: Column<T>[]
   rows: Row<T>[]
+  progress: number // integer percentage value
 }
 
 const Table = <T extends {}>({
@@ -44,11 +47,13 @@ const Table = <T extends {}>({
   rows,
   paginationOptions,
   filterOptions,
+  progress,
 }: TableProps<Row<T>>) => {
   const {
     resultsStartIndex,
     resultsEndIndex,
     resultsCount,
+    resultsPerPage,
     dispatchPageAction,
   } = usePagination(paginationOptions, rows)
 
@@ -67,6 +72,11 @@ const Table = <T extends {}>({
     return rows.slice(resultsStartIndex, resultsEndIndex) // slice end of range is non-inclusive
   }, [resultsStartIndex, resultsEndIndex, rows])
 
+  useEffect(() => console.log({ progress, resultsCount }), [
+    progress,
+    resultsCount,
+  ])
+
   return (
     <Card ref={tableRef}>
       <Scrollable>
@@ -84,6 +94,7 @@ const Table = <T extends {}>({
                 if (!filterOptions.filterState[field as string])
                   return <ColumnControls key={field as string} />
 
+                // If "All", no filter values are selected; otherwise derive state from individual values
                 const value = filterOptions.filterState[
                   field as string
                 ].all
@@ -117,118 +128,26 @@ const Table = <T extends {}>({
                 return (
                   <ColumnControls key={key}>
                     <Select
-                      isMulti
-                      placeholder="All"
-                      defaultValue={[]}
+                      dispatchFilterAction={
+                        filterOptions.dispatchFilterAction
+                      }
+                      filterState={filterOptions.filterState}
+                      field={field}
                       value={value}
-                      onChange={(state, action) => {
-                        switch (action.action) {
-                          case 'select-option': {
-                            const filterName = (action.option as {
-                              label: string
-                              value: string
-                            }).value
-
-                            if (filterName === 'ALL') {
-                              return filterOptions.dispatchFilterAction(
-                                {
-                                  type: 'SELECT_ALL',
-                                  columnName: field as string,
-                                },
-                              )
-                            } else {
-                              return filterOptions.dispatchFilterAction(
-                                {
-                                  type: 'SET_COLUMN_FILTER',
-                                  columnName: field as string,
-                                  filterName,
-                                  value: true,
-                                },
-                              )
-                            }
-                          }
-                          case 'remove-value': {
-                            if (state === null) {
-                              return filterOptions.dispatchFilterAction(
-                                {
-                                  type: 'SELECT_ALL',
-                                  columnName: field as string,
-                                },
-                              )
-                            } else {
-                              const filterName = (action.removedValue as {
-                                label: string
-                                value: string
-                              }).value
-                              return filterOptions.dispatchFilterAction(
-                                {
-                                  type: 'SET_COLUMN_FILTER',
-                                  columnName: field as string,
-                                  filterName,
-                                  value: false,
-                                },
-                              )
-                            }
-                          }
-                          case 'pop-value':
-                          case 'deselect-option': {
-                            if (state === null) {
-                              return filterOptions.dispatchFilterAction(
-                                {
-                                  type: 'SELECT_ALL',
-                                  columnName: field as string,
-                                },
-                              )
-                            } else {
-                              const filterName = (action.option as {
-                                label: string
-                                value: string
-                              }).value
-                              return filterOptions.dispatchFilterAction(
-                                {
-                                  type: 'SET_COLUMN_FILTER',
-                                  columnName: field as string,
-                                  filterName,
-                                  value: false,
-                                },
-                              )
-                            }
-                          }
-                          case 'clear':
-                            return filterOptions.dispatchFilterAction(
-                              {
-                                type: 'SELECT_ALL',
-                                columnName: field as string,
-                              },
-                            )
-                          default:
-                            throw new Error(
-                              `Unhandled react-select action type: ${action.action}`,
-                            )
-                        }
-                      }}
-                      options={[
-                        ...Object.keys(
-                          filterOptions.filterState[
-                            field as string
-                          ].values,
-                        ).map(option => ({
-                          label: option,
-                          value: option,
-                        })),
-                      ]}
                     />
                   </ColumnControls>
                 )
               })}
             </TR>
-
             <TR />
           </THead>
           <tbody>
             {page.map(row => {
               return (
-                <TR key={row.id}>
+                <TR
+                  key={row.id}
+                  incompletePage={page.length !== resultsPerPage}
+                >
                   {schema.map(({ field, cellDisplayOption }) => (
                     <TD key={field.toString()}>
                       {cellDisplayOption === 'RAW'
@@ -241,6 +160,10 @@ const Table = <T extends {}>({
             })}
           </tbody>
         </StyledTable>
+        <LoadingState progress={progress} />
+        {progress === 100 && resultsCount === 0 && (
+          <EmptyState />
+        )}
       </Scrollable>
       <Pagination>
         <PaginationButton
@@ -254,7 +177,8 @@ const Table = <T extends {}>({
           <LeftChevron disabled={resultsStartIndex === 0} />
         </PaginationButton>
         <PaginationInfo>
-          Results {resultsStartIndex + 1} -{' '}
+          Results{' '}
+          {resultsCount === 0 ? 0 : resultsStartIndex + 1} -{' '}
           {Math.min(resultsEndIndex, resultsCount)} of{' '}
           {resultsCount}
         </PaginationInfo>

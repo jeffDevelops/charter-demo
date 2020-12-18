@@ -5,8 +5,8 @@ const Tag = styled.span`
   margin-right: 4px;
   margin-bottom: 6px;
   border-radius: 8px;
-  background-color: #637081;
-  color: #fffffa;
+  background-color: #ecf3fc;
+  color: #637081;
   padding: 2px 8px;
   letter-spacing: 0.75px;
   font-size: 11px;

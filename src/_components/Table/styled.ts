@@ -8,6 +8,8 @@ export const Card = styled.section`
   box-shadow: 0 3px 7px #dce3fd;
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
+  border: 1px solid #ecf3fd;
 `
 
 export const Scrollable = styled.div`
@@ -59,6 +61,7 @@ export const ColumnControls = styled.th`
   font-size: 14px;
   background-color: #fffffa;
   box-shadow: 0 1px 0px #ecf3fd; /* border is collapsed from overall border-collapse, so simulate one with a box-shadow */
+  z-index: 1;
 `
 
 export const TD = styled.td`
@@ -73,15 +76,15 @@ export const TD = styled.td`
   }
 `
 
-export const TR = styled.tr`
+export const TR = styled.tr<{ incompletePage?: boolean }>`
   background-color: #fffffa;
 
   &:nth-child(odd) {
     background-color: #fcfcfc;
   }
-  /* Remove borders from bottom, so that they're flush with card */
+  /* If not an incomplete page, remove borders from bottom row, so that they're flush with card */
   &:last-of-type ${TD} {
-    border-bottom: 0px solid;
+    ${p => !p.incompletePage && `border-bottom: 0px;`}
   }
 `
 
