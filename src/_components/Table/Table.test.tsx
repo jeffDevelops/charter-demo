@@ -1,7 +1,6 @@
-import React, { RefObject } from 'react'
+import React from 'react'
 import { render, RenderResult } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
-import '@testing-library/jest-dom/extend-expect'
 import Table, { TableProps } from './Table'
 import { mockData, mockSchema } from './testUtils/mocks'
 import { TestSchema } from './testUtils/types'
@@ -51,7 +50,7 @@ describe('<Table />', () => {
   })
 
   it('renders the table headers according to the provided schema', () => {
-    const { getByTestId, queryByText } = renderTable()
+    const { getByTestId } = renderTable()
 
     const headings = getByTestId(
       'table_headings',
@@ -61,6 +60,28 @@ describe('<Table />', () => {
       expect(node.innerHTML).toMatch(
         new RegExp(mockSchema[index].heading, 'i'),
       )
+    })
+  })
+
+  it('renders the table data according to provided data', () => {
+    const { getByTestId } = renderTable()
+
+    const body = getByTestId('table_body')
+
+    body.querySelectorAll('tr').forEach((tr, trIndex) => {
+      tr.querySelectorAll('td').forEach((td, tdIndex) => {
+        // Differentiate between columns that are raw values, vs tags (which are tested in TableTags)
+        if (mockSchema[tdIndex].cellDisplayOption === 'RAW') {
+          expect(td.innerHTML).toMatch(
+            new RegExp(
+              mockData[trIndex][
+                mockSchema[tdIndex].field
+              ] as string,
+              'i',
+            ),
+          )
+        }
+      })
     })
   })
 })

@@ -1,6 +1,6 @@
 import { TestSchema } from './types'
 import { Column } from '../Table.d'
-import TableTags from '../TableTags'
+import TableTags from '../TableTags/TableTags'
 
 export const mockSchema: Column<TestSchema>[] = [
   {

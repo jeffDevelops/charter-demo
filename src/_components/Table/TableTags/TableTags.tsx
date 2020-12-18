@@ -1,5 +1,5 @@
 import React, { ReactText } from 'react'
-import Tag from '../../_styled/Tag'
+import Tag from '../../../_styled/Tag'
 
 interface TableTagsProps {
   tags: ReactText[]
